@@ -190,7 +190,7 @@ class ObjcppGenerator(spec: Spec) extends Generator(spec) {
 
       if (i.ext.objc) {
         w.wl
-        val objcExtSelf = objcppMarshal.helperClass("objc_proxy")
+        val objcExtSelf = objcppMarshal.helperClass("ObjcProxy")
         wrapNamespace(w, spec.objcppNamespace, w => {
           w.wl(s"class $helperClass::ObjcProxy final")
           w.wl(s": public $cppSelf")
@@ -247,7 +247,7 @@ class ObjcppGenerator(spec: Spec) extends Generator(spec) {
             //w.wl(s"return ${spec.cppNnCheckExpression.getOrElse("")}(objc->_cppRefHandle.get());")
           } else {
             // ObjC only, or ObjC and C++.
-            val objcExtSelf = objcppMarshal.helperClass("objc_proxy")
+            val objcExtSelf = objcppMarshal.helperClass("ObjcProxy")
             if (i.ext.cpp) {
               // If it could be implemented in C++, we might have to unwrap a proxy object.
               w.w(s"if ([(id)objc isKindOfClass:[$objcSelf class]])").braced {
@@ -268,13 +268,13 @@ class ObjcppGenerator(spec: Spec) extends Generator(spec) {
           if (i.ext.objc && !i.ext.cpp) {
             // ObjC only. In this case we *must* unwrap a proxy object - the dynamic_cast will
             // throw bad_cast if we gave it something of the wrong type.
-            val objcExtSelf = objcppMarshal.helperClass("objc_proxy")
+            val objcExtSelf = objcppMarshal.helperClass("ObjcProxy")
             w.wl(s"return dynamic_cast<$objcExtSelf&>(*cpp).Handle::get();")
           } else {
             // C++ only, or C++ and ObjC.
             if (i.ext.objc) {
               // If it could be implemented in ObjC, we might have to unwrap a proxy object.
-              val objcExtSelf = objcppMarshal.helperClass("objc_proxy")
+              val objcExtSelf = objcppMarshal.helperClass("ObjcProxy")
               w.w(s"if (auto cppPtr = dynamic_cast<$objcExtSelf*>(cpp.get()))").braced {
                 w.wl("return cppPtr->Handle::get();")
               }
